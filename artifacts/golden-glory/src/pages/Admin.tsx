@@ -378,7 +378,7 @@ export default function Admin() {
                 <div className="p-20 text-center"><RefreshCw className="w-10 h-10 animate-spin text-[#ffa602] mx-auto" /></div>
               ) : (
                 <div className="space-y-8">
-                  {Object.entries(groupedContent).map(([section, items]) => (
+                  {(Object.entries(groupedContent) as [string, any[]][]).map(([section, items]) => (
                     <div key={section} className="bg-white rounded-[2rem] shadow-sm border border-black/5 overflow-hidden">
                       <div className="bg-gray-50/50 px-8 py-5 border-b border-gray-100">
                         <h3 className="text-2xl font-bold text-[#111]">{section}</h3>
