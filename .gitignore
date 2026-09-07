@@ -49,3 +49,7 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# env
+artifacts/golden-glory/.env.local
+.env.local
