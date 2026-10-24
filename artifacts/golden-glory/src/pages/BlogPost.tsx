@@ -3,12 +3,62 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import PageTransition from '@/components/PageTransition';
-import { ArrowLeft, Clock, Calendar, User, Tag, Facebook, Linkedin, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Clock, Calendar, User, Tag, Facebook, Instagram, Linkedin, MessageCircle, CheckCircle2 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 import { blogs, BlogPost as BlogPostType } from '@/data/blogs';
 
 export default function BlogPost() {
   const params = useParams();
   const [blog, setBlog] = useState<BlogPostType | null>(null);
+  const [commentData, setCommentData] = useState({ name: '', email: '', comment: '' });
+  const [commentErrors, setCommentErrors] = useState<{ name?: string; email?: string; comment?: string }>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+
+  const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setCommentData(prev => ({ ...prev, [name]: value }));
+    setCommentErrors(prev => ({ ...prev, [name]: undefined }));
+  };
+
+  const validateComment = () => {
+    const errors: typeof commentErrors = {};
+    if (!commentData.name.trim()) errors.name = 'Please enter your name.';
+    if (!commentData.email.trim()) errors.email = 'Please enter your email.';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(commentData.email.trim())) errors.email = 'Please enter a valid email address.';
+    if (!commentData.comment.trim()) errors.comment = 'Please write a comment.';
+    setCommentErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleCommentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitError('');
+    if (!blog || !validateComment()) return;
+
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase.from('blog_comments').insert([
+        {
+          blog_slug: blog.slug,
+          name: commentData.name.trim(),
+          email: commentData.email.trim(),
+          comment: commentData.comment.trim()
+        }
+      ]);
+
+      if (error) throw error;
+
+      setIsSubmitted(true);
+      setCommentData({ name: '', email: '', comment: '' });
+    } catch (error) {
+      console.log(error);
+      setSubmitError('Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -82,13 +132,16 @@ export default function BlogPost() {
                 ))}
               </div>
               <div className="flex items-center gap-3">
-                <a href="#" className="w-10 h-10 bg-[#ffa602] text-white flex items-center justify-center rounded hover:bg-[#e69500] transition-colors">
+                <a href="https://www.facebook.com/people/Golden-Glory/61579901225099/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-10 h-10 bg-[#ffa602] text-white flex items-center justify-center rounded hover:bg-[#e69500] transition-colors">
                   <Facebook className="w-5 h-5" />
                 </a>
-                <a href="#" className="w-10 h-10 bg-[#ffa602] text-white flex items-center justify-center rounded hover:bg-[#e69500] transition-colors">
+                <a href="https://wa.me/919311076106" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="w-10 h-10 bg-[#ffa602] text-white flex items-center justify-center rounded hover:bg-[#e69500] transition-colors">
                   <MessageCircle className="w-5 h-5" />
                 </a>
-                <a href="#" className="w-10 h-10 bg-[#ffa602] text-white flex items-center justify-center rounded hover:bg-[#e69500] transition-colors">
+                <a href="https://www.instagram.com/goldenglory_space/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="w-10 h-10 bg-[#ffa602] text-white flex items-center justify-center rounded hover:bg-[#e69500] transition-colors">
+                  <Instagram className="w-5 h-5" />
+                </a>
+                <a href="https://www.linkedin.com/company/110180018/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="w-10 h-10 bg-[#ffa602] text-white flex items-center justify-center rounded hover:bg-[#e69500] transition-colors">
                   <Linkedin className="w-5 h-5" />
                 </a>
               </div>
@@ -99,24 +152,43 @@ export default function BlogPost() {
               <h2 className="text-3xl font-bold text-[#111] mb-2">Leave a Reply</h2>
               <p className="text-gray-500 mb-8">Your email address will not be published. Required fields are marked *</p>
               
-              <form className="space-y-6">
+              {isSubmitted ? (
+                <div className="flex flex-col items-center text-center gap-4 bg-[#FAF8ED] border border-gray-200 rounded-2xl px-6 py-12">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                    <CheckCircle2 className="w-8 h-8" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-[#111]">Thank you for your comment!</h3>
+                  <p className="text-gray-500 max-w-md">Your comment has been submitted successfully and will appear once it is reviewed.</p>
+                  <button type="button" onClick={() => setIsSubmitted(false)} className="text-[#f95b29] font-bold hover:underline">
+                    Post another comment
+                  </button>
+                </div>
+              ) : (
+              <form className="space-y-6" onSubmit={handleCommentSubmit} noValidate>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <input type="text" placeholder="Name *" className="w-full bg-[#FAF8ED] border border-gray-200 px-6 py-4 rounded-xl focus:outline-none focus:border-[#ffa602] transition-colors" />
+                    <input type="text" name="name" value={commentData.name} onChange={handleCommentChange} placeholder="Name *" className={`w-full bg-[#FAF8ED] border px-6 py-4 rounded-xl focus:outline-none focus:border-[#ffa602] transition-colors ${commentErrors.name ? 'border-red-400' : 'border-gray-200'}`} />
+                    {commentErrors.name && <p className="text-red-500 text-sm font-medium mt-2">{commentErrors.name}</p>}
                   </div>
                   <div>
-                    <input type="email" placeholder="Email *" className="w-full bg-[#FAF8ED] border border-gray-200 px-6 py-4 rounded-xl focus:outline-none focus:border-[#ffa602] transition-colors" />
+                    <input type="email" name="email" value={commentData.email} onChange={handleCommentChange} placeholder="Email *" className={`w-full bg-[#FAF8ED] border px-6 py-4 rounded-xl focus:outline-none focus:border-[#ffa602] transition-colors ${commentErrors.email ? 'border-red-400' : 'border-gray-200'}`} />
+                    {commentErrors.email && <p className="text-red-500 text-sm font-medium mt-2">{commentErrors.email}</p>}
                   </div>
                 </div>
                 <div>
-                  <textarea placeholder="Comment *" rows={6} className="w-full bg-[#FAF8ED] border border-gray-200 px-6 py-4 rounded-xl focus:outline-none focus:border-[#ffa602] transition-colors resize-none"></textarea>
+                  <textarea name="comment" value={commentData.comment} onChange={handleCommentChange} placeholder="Comment *" rows={6} className={`w-full bg-[#FAF8ED] border px-6 py-4 rounded-xl focus:outline-none focus:border-[#ffa602] transition-colors resize-none ${commentErrors.comment ? 'border-red-400' : 'border-gray-200'}`}></textarea>
+                  {commentErrors.comment && <p className="text-red-500 text-sm font-medium mt-2">{commentErrors.comment}</p>}
                 </div>
+                {submitError && (
+                  <p className="text-red-500 text-sm font-medium">{submitError}</p>
+                )}
                 <div>
-                  <button type="button" className="bg-[#a4d232] text-[#111] font-bold px-8 py-4 rounded-xl hover:bg-[#91ba2d] transition-colors shadow-lg shadow-[#a4d232]/20 flex items-center gap-2">
-                    Post Comment
+                  <button type="submit" disabled={isSubmitting} className="bg-[#a4d232] text-[#111] font-bold px-8 py-4 rounded-xl hover:bg-[#91ba2d] transition-colors shadow-lg shadow-[#a4d232]/20 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
+                    {isSubmitting ? 'Posting...' : 'Post Comment'}
                   </button>
                 </div>
               </form>
+              )}
             </div>
             
           </div>

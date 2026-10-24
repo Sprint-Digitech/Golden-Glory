@@ -86,7 +86,7 @@ export default function ContactUsSection() {
                       <a href="https://www.facebook.com/people/Golden-Glory/61579901225099/" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-[#432c1c] transition-colors">
                         <Facebook className="w-6 h-6" />
                       </a>
-                      <a href="https://www.instagram.com/goldenglory_coworking_space/" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-[#432c1c] transition-colors">
+                      <a href="https://www.instagram.com/goldenglory_space/" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-[#432c1c] transition-colors">
                         <Instagram className="w-6 h-6" />
                       </a>
                     </div>
