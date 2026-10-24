@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
-import { MapPin, Instagram, Facebook, Mail, Phone, ArrowRight } from 'lucide-react';
+import { MapPin, Instagram, Facebook, Linkedin, Mail, Phone, ArrowRight } from 'lucide-react';
 import { useSiteContent } from '@/hooks/useSiteContent';
 
 export default function Footer() {
@@ -30,11 +30,14 @@ export default function Footer() {
               A premium coworking space in Noida designed to inspire creativity, foster collaboration, and drive your business forward.
             </p>
             <div className="flex items-center gap-4">
-              <a href="https://www.instagram.com/goldenglory_coworking_space/" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-300 hover:bg-[#ffa602] hover:text-[#111] hover:border-[#ffa602] transition-all duration-300">
+              <a href="https://www.instagram.com/goldenglory_space/" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-300 hover:bg-[#ffa602] hover:text-[#111] hover:border-[#ffa602] transition-all duration-300">
                 <Instagram className="w-5 h-5" />
               </a>
               <a href="https://www.facebook.com/people/Golden-Glory/61579901225099/" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-300 hover:bg-[#ffa602] hover:text-[#111] hover:border-[#ffa602] transition-all duration-300">
                 <Facebook className="w-5 h-5" />
+              </a>
+              <a href="https://www.linkedin.com/company/110180018/" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-300 hover:bg-[#ffa602] hover:text-[#111] hover:border-[#ffa602] transition-all duration-300">
+                <Linkedin className="w-5 h-5" />
               </a>
             </div>
           </div>
